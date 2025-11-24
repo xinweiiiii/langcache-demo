@@ -123,4 +123,5 @@ This will start a command-line chatbot where you can:
 
 - **Redis LangCache Documentation:** https://redis.io/docs/latest/solutions/semantic-caching/langcache/
 - **Redis Website:** https://redis.io/
+- **Deployed Demo:** https://xinweiiiii-langcache-demo.hf.space/
 
