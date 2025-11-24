@@ -554,8 +554,8 @@ custom_theme = gr.themes.Soft(primary_hue="blue")
 # JavaScript to initialize and toggle theme
 theme_js = """
 function() {
-    // Initialize theme from localStorage or default to dark
-    const currentTheme = localStorage.getItem('theme') || 'dark';
+    // Initialize theme from localStorage or default to light
+    const currentTheme = localStorage.getItem('theme') || 'light';
     document.body.classList.toggle('dark', currentTheme === 'dark');
 
     // Toggle theme
@@ -586,7 +586,7 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
 
     # Theme toggle button
     with gr.Row():
-        theme_toggle_btn = gr.Button("🌙 Dark Mode", size="sm", scale=0, elem_id="theme-toggle")
+        theme_toggle_btn = gr.Button("☀️ Light Mode", size="sm", scale=0, elem_id="theme-toggle")
 
     theme_toggle_btn.click(
         fn=None,
