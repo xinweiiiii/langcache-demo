@@ -549,17 +549,27 @@ button.primary:hover, .gr-button-primary:hover {
 """
 
 # ============== APP (preserved A/B layout) ==============
-dark_theme = gr.themes.Soft(
-    primary_hue="blue",
-).set(
-    body_background_fill="#0b0f19",
-    body_background_fill_dark="#0b0f19",
-    block_background_fill="#1a1f2e",
-    block_label_background_fill="#1a1f2e",
-    input_background_fill="#262d3d",
-)
+custom_theme = gr.themes.Soft(primary_hue="blue")
 
-with gr.Blocks(title="Redis LangCache — English Demo", theme=dark_theme, css=CUSTOM_CSS, elem_id="app-root") as demo:
+# JavaScript to initialize and toggle theme
+theme_js = """
+function() {
+    // Initialize theme from localStorage or default to dark
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.body.classList.toggle('dark', currentTheme === 'dark');
+
+    // Toggle theme
+    window.toggleTheme = function() {
+        const isDark = document.body.classList.toggle('dark');
+        localStorage.setItem('theme', isDark ? 'dark' : 'light');
+        return isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
+    };
+
+    return currentTheme === 'dark' ? '🌙 Dark Mode' : '☀️ Light Mode';
+}
+"""
+
+with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css=CUSTOM_CSS, elem_id="app-root") as demo:
     st = gr.State({"hits": 0, "misses": 0, "saved_cost": 0.0})
 
     # Title + Subtitle
@@ -573,6 +583,20 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=dark_theme, css=C
         </p>
       </div>
     """)
+
+    # Theme toggle button
+    with gr.Row():
+        theme_toggle_btn = gr.Button("🌙 Dark Mode", size="sm", scale=0, elem_id="theme-toggle")
+
+    theme_toggle_btn.click(
+        fn=None,
+        js="""() => {
+            const isDark = document.body.classList.toggle('dark');
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            return isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
+        }""",
+        outputs=theme_toggle_btn
+    )
 
     # Settings
     with gr.Group(elem_classes=["config-card"]):
@@ -773,6 +797,13 @@ with gr.Blocks(title="Redis LangCache — English Demo", css=CUSTOM_CSS) as app:
     password_input.change(
         fn=clear_error,
         outputs=[login_status]
+    )
+
+    # Initialize theme on page load
+    app.load(
+        fn=None,
+        js=theme_js,
+        outputs=theme_toggle_btn
     )
 
 if __name__ == "__main__":

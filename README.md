@@ -70,7 +70,7 @@ pip install -r requirements.txt
 ### 2) Run Simple CLI Demo
 
 ```bash
-python main.py
+python app.py
 ```
 
 This will start a command-line chatbot where you can:
