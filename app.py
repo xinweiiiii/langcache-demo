@@ -549,7 +549,17 @@ button.primary:hover, .gr-button-primary:hover {
 """
 
 # ============== APP (preserved A/B layout) ==============
-with gr.Blocks(title="Redis LangCache — English Demo", theme=gr.themes.Soft(primary_hue="blue"), css=CUSTOM_CSS, elem_id="app-root", js="() => {document.body.classList.add('dark')}") as demo:
+dark_theme = gr.themes.Soft(
+    primary_hue="blue",
+).set(
+    body_background_fill="#0b0f19",
+    body_background_fill_dark="#0b0f19",
+    block_background_fill="#1a1f2e",
+    block_label_background_fill="#1a1f2e",
+    input_background_fill="#262d3d",
+)
+
+with gr.Blocks(title="Redis LangCache — English Demo", theme=dark_theme, css=CUSTOM_CSS, elem_id="app-root") as demo:
     st = gr.State({"hits": 0, "misses": 0, "saved_cost": 0.0})
 
     # Title + Subtitle
