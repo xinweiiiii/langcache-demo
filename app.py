@@ -709,9 +709,11 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
         if not lang_cache:
             return "⚠️ LangCache not configured.", "{}"
         try:
-            result = lang_cache.delete_query(attributes={})
-            msg = f"✅ Cache cleared successfully"
-            return msg, json.dumps({"status": "success"}, indent=2)
+            # Delete all entries by querying with attributes=None (matches all)
+            result = lang_cache.delete_query(attributes=None)
+            deleted = parse_deleted_count(result)
+            msg = f"✅ Cache cleared successfully. Removed={deleted if deleted is not None else '—'}"
+            return msg, json.dumps({"status": "success", "deleted": deleted}, indent=2)
         except Exception as e:
             return f"❌ Error: {e}", json.dumps({"error": str(e)}, indent=2)
 
