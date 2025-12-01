@@ -2,6 +2,7 @@
 langcache==0.10.1
 openai==1.109.1
 python-dotenv==1.1.1
+requests==2.32.3
 
 # Gradio UI
 gradio==5.49.0

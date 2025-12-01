@@ -7,6 +7,7 @@ Redis LangCache Demo - Gradio UI
 import json
 import os
 import re
+import requests
 import time
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
@@ -247,8 +248,8 @@ def search_and_answer(
     cached_answer = None
     if lang_cache:
         try:
-            # Search with default app attribute
-            results = lang_cache.search(prompt=prompt, attributes={"app": "langcache-demo"})
+            # Search with attributes=None (no attributes configured)
+            results = lang_cache.search(prompt=prompt, attributes=None)
 
             if results and getattr(results, "data", None):
                 cached_answer = results.data[0].response
@@ -270,8 +271,8 @@ def search_and_answer(
     # Store in cache
     if lang_cache:
         try:
-            # Build set parameters with a default attribute for deletion support
-            set_params = {"prompt": prompt, "response": llm_answer, "attributes": {"app": "langcache-demo"}}
+            # Build set parameters with attributes=None
+            set_params = {"prompt": prompt, "response": llm_answer, "attributes": None}
             if ttl_ms is not None:
                 set_params["ttl_millis"] = ttl_ms
             lang_cache.set(**set_params)
@@ -708,12 +709,24 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
     def handle_clear():
         if not lang_cache:
             return "⚠️ LangCache not configured.", "{}"
+
         try:
-            # Delete all cache entries by using the default app attribute
-            result = lang_cache.delete_query(attributes={"app": "langcache-demo"})
-            deleted = parse_deleted_count(result)
-            msg = f"✅ All cache entries cleared successfully. Removed={deleted if deleted is not None else '—'}"
-            return msg, json.dumps({"status": "success", "deleted": deleted}, indent=2)
+            # Try using REST API directly to flush the cache
+            url = f"{LANGCACHE_BASE_URL}/v1/caches/{LANGCACHE_CACHE_ID}/flush"
+            headers = {
+                "Authorization": f"Bearer {LANGCACHE_API_KEY}",
+                "Content-Type": "application/json"
+            }
+
+            response = requests.post(url, headers=headers)
+
+            if response.status_code == 200 or response.status_code == 204:
+                msg = "✅ All cache entries cleared successfully"
+                return msg, json.dumps({"status": "success", "response": response.text or "Cache flushed"}, indent=2)
+            else:
+                msg = f"⚠️ Failed to clear cache: HTTP {response.status_code}"
+                return msg, json.dumps({"status": "error", "code": response.status_code, "response": response.text}, indent=2)
+
         except Exception as e:
             return f"❌ Error: {e}", json.dumps({"error": str(e)}, indent=2)
 
