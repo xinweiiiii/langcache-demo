@@ -247,8 +247,8 @@ def search_and_answer(
     cached_answer = None
     if lang_cache:
         try:
-            # Search with attributes=None (no attributes configured)
-            results = lang_cache.search(prompt=prompt, attributes=None)
+            # Search with default app attribute
+            results = lang_cache.search(prompt=prompt, attributes={"app": "langcache-demo"})
 
             if results and getattr(results, "data", None):
                 cached_answer = results.data[0].response
@@ -270,8 +270,8 @@ def search_and_answer(
     # Store in cache
     if lang_cache:
         try:
-            # Build set parameters with attributes=None
-            set_params = {"prompt": prompt, "response": llm_answer, "attributes": None}
+            # Build set parameters with a default attribute for deletion support
+            set_params = {"prompt": prompt, "response": llm_answer, "attributes": {"app": "langcache-demo"}}
             if ttl_ms is not None:
                 set_params["ttl_millis"] = ttl_ms
             lang_cache.set(**set_params)
@@ -709,10 +709,11 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
         if not lang_cache:
             return "⚠️ LangCache not configured.", "{}"
         try:
-            # Use flush() method to clear all cache entries
-            result = lang_cache.flush()
-            msg = f"✅ All cache entries cleared successfully"
-            return msg, json.dumps({"status": "success", "result": str(result)}, indent=2)
+            # Delete all cache entries by using the default app attribute
+            result = lang_cache.delete_query(attributes={"app": "langcache-demo"})
+            deleted = parse_deleted_count(result)
+            msg = f"✅ All cache entries cleared successfully. Removed={deleted if deleted is not None else '—'}"
+            return msg, json.dumps({"status": "success", "deleted": deleted}, indent=2)
         except Exception as e:
             return f"❌ Error: {e}", json.dumps({"error": str(e)}, indent=2)
 
