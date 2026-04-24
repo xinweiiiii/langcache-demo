@@ -385,7 +385,7 @@ CUSTOM_CSS = """
   --soft: #475569;
   --muted: #94a3b8;
   --line: #e2e8f0;
-  --bg: #f1f5f9;
+  --bg: #ffffff;
   --white: #ffffff;
   --radius: 14px;
   --hit-color: #059669;
@@ -553,11 +553,20 @@ body, #app-root { background: var(--bg) !important; }
 
 /* ── Config card ── */
 .config-card {
-  background: var(--white);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  padding: 14px 16px;
-  margin: 16px;
+  background: var(--white) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius) !important;
+  padding: 14px 16px !important;
+  margin: 10px 16px 0 !important;
+  box-shadow: none !important;
+}
+
+/* Keep internal Gradio blocks inside the config card normal */
+.config-card .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
 }
 
 .config-card label {
@@ -566,25 +575,66 @@ body, #app-root { background: var(--bg) !important; }
   color: var(--ink) !important;
 }
 
-/* ── KPI strip ── */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 12px;
-  margin: 16px;
+/* ── Chat textboxes ── */
+.chat-row textarea,
+.gradio-container textarea {
+  background: var(--white) !important;
+  color: var(--ink) !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: 10px !important;
 }
 
-@media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
-@media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr; } }
+.gradio-container .block label span {
+  color: var(--ink) !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+}
+
+/* ── Chat card ── */
+.chat-card {
+  background: var(--white) !important;
+  border: 1px solid var(--line) !important;
+  border-radius: var(--radius) !important;
+  padding: 16px !important;
+  margin: 10px 16px 0 !important;
+  box-shadow: none !important;
+}
+
+.chat-card .block {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+.ask-row { gap: 8px !important; }
+.badge-row { gap: 8px !important; margin-top: 8px !important; }
+
+/* Accordions side margin */
+.gradio-container details {
+  margin: 8px 16px 0 !important;
+  border-radius: 10px !important;
+}
+
+/* ── KPI strip ── */
+#kpi-row {
+  gap: 10px !important;
+  padding: 10px 16px !important;
+  flex-wrap: nowrap !important;
+}
+
+/* Each gr.HTML cell inside the KPI row should fill its column */
+#kpi-row > div { min-width: 0; padding: 0 !important; }
 
 .kpi {
   background: var(--white);
   border: 1px solid var(--line);
   border-radius: 12px;
-  padding: 16px 18px;
+  padding: 14px 16px;
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 2px;
+  height: 100%;
   transition: transform .18s ease, box-shadow .18s ease;
 }
 
@@ -771,15 +821,109 @@ body.dark .section-heading {
   color: var(--ink);
 }
 
-/* Gradio overrides */
-.gradio-container { background: var(--bg) !important; }
-footer { display: none !important; }
+/* ── Override Gradio CSS variables at root so no theme can re-grey anything ── */
+:root, .gradio-container {
+  --color-background-primary: #ffffff !important;
+  --color-background-secondary: #ffffff !important;
+  --input-background-fill: #ffffff !important;
+  --input-background-fill-focus: #ffffff !important;
+  --block-background-fill: #ffffff !important;
+  --panel-background-fill: #ffffff !important;
+  --form-gap-width: 0px !important;
+  --layout-gap: 0px !important;
+  --section-header-text-size: 13px !important;
+  --block-border-width: 0px !important;
+  --block-shadow: none !important;
+  --input-border-width: 1.5px !important;
+  --input-border-color: #e2e8f0 !important;
+  --input-radius: 8px !important;
+  --neutral-50: #ffffff !important;
+  --neutral-100: #ffffff !important;
+  --neutral-200: #f8fafc !important;
+}
 
-.h1 { color: var(--ink) !important; background: transparent !important; }
+/* ── Nuke all grey — comprehensive Gradio overrides ── */
+.gradio-container,
+.gradio-container .contain,
+.gradio-container .wrap,
+.gradio-container .gap,
+.gradio-container .block,
+.gradio-container .form,
+.gradio-container .border-none,
+.gradio-container fieldset,
+body, #app-root {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+}
+
+/* Inputs / textareas: white bg, clean border */
+.gradio-container input,
+.gradio-container textarea,
+.gradio-container select {
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: var(--ink) !important;
+  border: 1.5px solid var(--line) !important;
+  border-radius: 8px !important;
+}
+
+.gradio-container input:focus,
+.gradio-container textarea:focus {
+  border-color: var(--redis-red) !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(216,44,32,.1) !important;
+}
+
+/* Remove all box shadows and borders Gradio adds to blocks */
+.gradio-container .block {
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+}
+
+/* Outermost wrapper */
+.gradio-container > .contain {
+  padding: 0 !important;
+  max-width: 100% !important;
+  gap: 0 !important;
+}
+
+.gradio-container > .contain > .gap {
+  gap: 0 !important;
+}
+
+/* Accordions */
+.gradio-container details {
+  margin: 8px 16px 0 !important;
+  border-radius: 10px !important;
+  background: #ffffff !important;
+  border: 1px solid var(--line) !important;
+}
+.gradio-container details summary {
+  background: #ffffff !important;
+}
+.gradio-container details .gap {
+  background: #ffffff !important;
+}
+
+/* Slider track background */
+.gradio-container input[type=range] {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Checkbox */
+.gradio-container input[type=checkbox] {
+  border: 1.5px solid var(--line) !important;
+  border-radius: 4px !important;
+}
+
+footer { display: none !important; }
+.h1 { color: var(--ink) !important; background: #ffffff !important; }
 """
 
 # ============== APP (preserved A/B layout) ==============
-custom_theme = gr.themes.Soft(primary_hue="blue")
+custom_theme = gr.themes.Base()
 
 # JavaScript to initialize and toggle theme
 theme_js = """
@@ -802,33 +946,34 @@ function() {
 with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css=CUSTOM_CSS, elem_id="app-root") as demo:
     st = gr.State({"hits": 0, "misses": 0, "saved_cost": 0.0})
 
-    # ── Header ──
+    # ── Everything in one HTML block to avoid Gradio inter-component gaps ──
     gr.HTML("""
-      <div class="app-header">
-        <div class="app-header-brand">
-          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
-               alt="Redis" onerror="this.style.display='none'">
-          <div class="app-header-divider"></div>
-          <div class="app-header-text">
-            <div class="app-title">LangCache Demo</div>
-            <div class="app-sub">Semantic Caching for LLM Applications</div>
+      <div class="app-shell">
+        <!-- Header -->
+        <div class="app-header">
+          <div class="app-header-brand">
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
+                 alt="Redis" onerror="this.style.display='none'">
+            <div class="app-header-divider"></div>
+            <div class="app-header-text">
+              <div class="app-title">LangCache Demo</div>
+              <div class="app-sub">Semantic Caching for LLM Applications</div>
+            </div>
           </div>
+          <div class="app-header-badge">⚡ Powered by Redis</div>
         </div>
-        <div class="app-header-badge">⚡ Powered by Redis</div>
-      </div>
-    """)
 
-    # ── Hero ──
-    gr.HTML("""
-      <div class="hero">
-        <div class="hero-icon">🧠</div>
-        <div class="hero-content">
-          <div class="hero-title">Simple Semantic Caching with LangCache</div>
-          <p class="hero-sub">
-            LangCache caches LLM responses and reuses them for semantically similar questions —
-            saving cost and cutting latency. Ask the same question twice to see a cache hit,
-            or rephrase it to test semantic matching.
-          </p>
+        <!-- Hero -->
+        <div class="hero">
+          <div class="hero-icon">🧠</div>
+          <div class="hero-content">
+            <div class="hero-title">Simple Semantic Caching with LangCache</div>
+            <p class="hero-sub">
+              LangCache caches LLM responses and reuses them for semantically similar questions —
+              saving cost and cutting latency. Ask the same question twice to see a cache hit,
+              or rephrase it to test semantic matching.
+            </p>
+          </div>
         </div>
       </div>
     """)
@@ -850,34 +995,32 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
                 info="Try exact match first, then fall back to semantic"
             )
 
-    # ── KPI strip ──
-    gr.HTML("<div class='kpi-row' id='kpi-strip'>")
-    with gr.Row(elem_classes=["kpi-row"]):
+    # ── KPI strip (4 HTML cells inside a single gr.Row) ──
+    with gr.Row(elem_id="kpi-row"):
         kpi_hits    = gr.HTML("<div class='kpi kpi-hits'><div class='kpi-icon'>✅</div><div class='kpi-value'>0</div><div class='kpi-label'>Cache Hits</div></div>")
         kpi_misses  = gr.HTML("<div class='kpi kpi-misses'><div class='kpi-icon'>⚡</div><div class='kpi-value'>0</div><div class='kpi-label'>Cache Misses</div></div>")
         kpi_rate    = gr.HTML("<div class='kpi kpi-rate'><div class='kpi-icon'>📊</div><div class='kpi-value'>—</div><div class='kpi-label'>Hit Rate</div></div>")
         kpi_savings = gr.HTML("<div class='kpi kpi-savings'><div class='kpi-icon'>💰</div><div class='kpi-value'>$0.0000</div><div class='kpi-label'>Cost Saved</div></div>")
-    gr.HTML("</div>")
 
     # ── Chat interface ──
-    gr.HTML("<div style='margin: 0 16px;'>")
-    gr.HTML("<div class='section-heading'>💬 Ask a Question</div>")
-    with gr.Row():
-        with gr.Column(scale=5):
-            prompt_input = gr.Textbox(
-                label="",
-                placeholder="e.g. What is machine learning?",
-                lines=3,
-                show_label=False,
-            )
-        with gr.Column(scale=1, min_width=120):
-            ask_btn = gr.Button("Ask →", variant="primary", size="lg")
+    with gr.Group(elem_classes=["chat-card"]):
+        gr.HTML("<div class='section-heading' style='margin:0 0 10px;'>💬 Ask a Question</div>")
+        with gr.Row(elem_classes=["ask-row"]):
+            with gr.Column(scale=5):
+                prompt_input = gr.Textbox(
+                    label="",
+                    placeholder="e.g. What is machine learning?",
+                    lines=3,
+                    show_label=False,
+                )
+            with gr.Column(scale=1, min_width=120):
+                ask_btn = gr.Button("Ask →", variant="primary", size="lg")
 
-    answer_output = gr.Textbox(label="Answer", lines=6, interactive=False)
+        answer_output = gr.Textbox(label="Answer", lines=6, interactive=False)
 
-    with gr.Row():
-        source_output  = gr.HTML()
-        latency_output = gr.HTML()
+        with gr.Row(elem_classes=["badge-row"]):
+            source_output  = gr.HTML()
+            latency_output = gr.HTML()
 
     with gr.Accordion("🔍 Debug Info", open=False):
         debug_output = gr.Code(label="Debug JSON", language="json")
@@ -887,7 +1030,6 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
         flush_status = gr.HTML()
         with gr.Accordion("Flush Debug", open=False):
             flush_debug = gr.Code(language="json")
-    gr.HTML("</div>")
 
     # ── How-to ──
     gr.HTML("""
@@ -1027,55 +1169,82 @@ def check_password(password):
 
 # Wrap the demo with password protection
 LOGIN_EXTRA_CSS = """
-/* Force login container to fill viewport and center the card */
-#login-container > .gap,
-#login-container > .form {
+/* Full-page gradient background */
+#login-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0b1220 0%, #1a1f2e 60%, #7a1610 150%) !important;
   display: flex !important;
-  flex-direction: column !important;
   align-items: center !important;
   justify-content: center !important;
-  min-height: 100vh !important;
+  padding: 40px 20px !important;
 }
 
-/* Card styling */
-#login-card-wrap {
-  width: 100%;
-  max-width: 420px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 40px;
-  box-shadow: 0 20px 60px rgba(0,0,0,.30);
+/* Remove Gradio's default column gap/padding inside login */
+#login-container > .gap { gap: 0 !important; }
+
+/* The card column */
+#login-card {
+  background: #ffffff !important;
+  border-radius: 20px !important;
+  border: none !important;
+  box-shadow: 0 24px 64px rgba(0,0,0,.40) !important;
+  padding: 40px 36px !important;
+  max-width: 420px !important;
+  width: 100% !important;
 }
 
-#login-container {
-  background: linear-gradient(135deg, #0b1220 0%, #1a1f2e 60%, #8b1a14 150%) !important;
-  min-height: 100vh !important;
+/* Remove inner gap in the card column */
+#login-card > .gap { gap: 12px !important; }
+
+/* Style the password textbox inside the card */
+#password-input input {
+  border-radius: 10px !important;
+  border: 1.5px solid #e2e8f0 !important;
+  font-size: 15px !important;
+  padding: 10px 14px !important;
+  transition: border-color .2s;
+}
+#password-input input:focus {
+  border-color: #D82C20 !important;
+  box-shadow: 0 0 0 3px rgba(216,44,32,.12) !important;
+}
+
+/* Login button full width */
+#login-btn button {
+  width: 100% !important;
+  border-radius: 10px !important;
+  font-size: 15px !important;
+  padding: 12px !important;
 }
 """
 
 with gr.Blocks(title="Redis LangCache — English Demo", css=CUSTOM_CSS + LOGIN_EXTRA_CSS) as app:
     with gr.Column(visible=True, elem_id="login-container") as login_box:
-        gr.HTML("""
-            <div id="login-card-wrap">
-              <div style="text-align:center; margin-bottom:28px;">
-                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
-                     alt="Redis" style="height:36px; margin-bottom:16px; display:block; margin-left:auto; margin-right:auto;"
-                     onerror="this.style.display='none'">
-                <div style="font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:#0b1220; margin-bottom:6px;">
-                  Redis LangCache Demo
+        with gr.Column(elem_id="login-card", scale=0, min_width=380):
+            gr.HTML("""
+                <div style="text-align:center; margin-bottom:28px;">
+                  <img
+                    src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
+                    alt="Redis"
+                    style="height:32px; display:block; margin:0 auto 16px; filter:none;"
+                    onerror="this.style.display='none'">
+                  <div style="font-family:'Space Grotesk',Inter,sans-serif; font-size:22px; font-weight:700; color:#0b1220; margin-bottom:6px; line-height:1.2;">
+                    Redis LangCache Demo
+                  </div>
+                  <div style="font-size:13px; color:#64748b; line-height:1.5;">
+                    Enter your password to continue
+                  </div>
                 </div>
-                <div style="font-size:13px; color:#64748b;">Enter your password to continue</div>
-              </div>
-        """)
-        password_input = gr.Textbox(
-            label="Password",
-            type="password",
-            placeholder="Enter password…",
-            elem_id="password-input"
-        )
-        login_btn = gr.Button("Login →", variant="primary", size="lg")
-        login_status = gr.HTML("")
-        gr.HTML("</div>")
+            """)
+            password_input = gr.Textbox(
+                label="Password",
+                type="password",
+                placeholder="Enter password…",
+                elem_id="password-input",
+                show_label=False,
+            )
+            login_btn = gr.Button("Login →", variant="primary", size="lg", elem_id="login-btn")
+            login_status = gr.HTML("")
 
     with gr.Column(visible=False) as main_app:
         demo.render()
