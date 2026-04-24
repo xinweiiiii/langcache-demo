@@ -375,177 +375,406 @@ def calc_savings(tokens_est: int, price_in: float, price_out: float, frac_in: fl
 
 # ===================== CSS (VISUAL ONLY) =====================
 CUSTOM_CSS = """
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap');
 
+/* ── Design tokens ── */
 :root {
-  --redis-red:#D82C20; --ink:#0b1220; --soft:#475569; --muted:#64748b;
-  --line:#e5e7eb; --bg:#f6f7f9; --white:#ffffff; --radius:14px;
-  --success:#10b981; --warning:#f59e0b;
+  --redis-red: #D82C20;
+  --redis-red-dark: #b02018;
+  --ink: #0b1220;
+  --soft: #475569;
+  --muted: #94a3b8;
+  --line: #e2e8f0;
+  --bg: #f1f5f9;
+  --white: #ffffff;
+  --radius: 14px;
+  --hit-color: #059669;
+  --hit-bg: #d1fae5;
+  --miss-color: #d97706;
+  --miss-bg: #fef3c7;
+  --rate-color: #2563eb;
+  --rate-bg: #dbeafe;
+  --savings-color: #D82C20;
 }
 
-* { font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif; }
-body, #app-root { background: var(--bg); }
-
-/* HEADER */
-.app-header {
-  position: sticky; top: 0; z-index: 50;
-  display:flex; align-items:center; justify-content:space-between; gap:12px;
-  padding:14px 16px; background: var(--redis-red); color:#fff;
-  box-shadow: 0 2px 8px rgba(0,0,0,.18);
-}
-.app-header .brand { display:flex; align-items:center; gap:14px; flex:1; }
-.app-header .brand img { height:24px; display:block; }
-.app-header .brand-content { display:flex; flex-direction:column; gap:4px; flex:1; }
-.app-header .title {
-  font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size:20px; font-weight:700; letter-spacing:.3px;
-  line-height:1.2;
-}
-.app-header .meta {
-  display:flex; align-items:center; gap:12px; flex-wrap:wrap;
-  font-size:12px; opacity:0.95; font-weight:500;
-}
-.app-header .meta-item {
-  display:inline-flex; align-items:center; gap:6px;
-  padding:3px 8px; background:rgba(255,255,255,0.15);
-  border-radius:6px; white-space:nowrap;
-}
-.app-header .meta-item .label { opacity:0.8; }
-.app-header .meta-item .value { font-weight:600; }
-.app-header .links { display:flex; gap:8px; }
-.app-header .links a {
-  display:inline-flex; align-items:center; gap:8px; color:#fff; text-decoration:none;
-  border:1px solid rgba(255,255,255,.35); padding:7px 12px; border-radius:999px; font-weight:600; font-size:12px;
-  transition: background .15s ease, transform .15s ease;
-}
-.app-header .links a:hover { background: rgba(255,255,255,.14); transform: translateY(-1px); }
-
-/* Mobile responsive header */
-@media (max-width: 768px) {
-  .app-header { flex-direction:column; align-items:flex-start; padding:12px; }
-  .app-header .brand { flex-direction:column; align-items:flex-start; gap:10px; }
-  .app-header .brand img { height:20px; }
-  .app-header .title { font-size:16px; }
-  .app-header .meta { gap:8px; }
-  .app-header .meta-item { font-size:11px; padding:2px 6px; }
-  .app-header .links { width:100%; justify-content:flex-start; }
+/* ── Dark mode tokens ── */
+body.dark {
+  --ink: #f1f5f9;
+  --soft: #94a3b8;
+  --muted: #64748b;
+  --line: #1e293b;
+  --bg: #0f172a;
+  --white: #1e293b;
 }
 
-/* HEADINGS */
-.h1 {
-  font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size:26px; font-weight:700; color:var(--ink); margin:16px 16px 6px;
-}
-.h2 {
-  font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size:16px; font-weight:600; color:var(--soft); margin:0 16px 14px;
+* { box-sizing: border-box; }
+
+*, *::before, *::after {
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* Config box (clean) */
-.config-card {
-  margin: 10px 16px 14px; padding:12px;
+body, #app-root { background: var(--bg) !important; }
+
+/* ── Login page ── */
+#login-container {
+  min-height: 100vh;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #0b1220 0%, #1a1f2e 50%, #D82C20 150%);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
   background: var(--white);
-  border:1px solid var(--line); border-radius: var(--radius);
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.35);
 }
 
-/* KPIs */
-.kpi-row { display:flex; gap:12px; margin: 0 16px 16px; flex-wrap: wrap; }
-.kpi {
-  flex:1; min-width: 140px; background: var(--white); border:1px solid var(--line); border-radius:12px;
-  padding:18px 20px; transition: transform .2s ease, box-shadow .2s ease;
+.login-logo {
+  display: block;
+  height: 36px;
+  margin: 0 auto 20px;
 }
-.kpi:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,.08); }
-.kpi .kpi-num {
+
+.login-title {
   font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size:24px; font-weight:700; color:var(--ink); line-height:1.1;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--ink);
+  text-align: center;
+  margin: 0 0 6px;
 }
-.kpi .kpi-value {
-  font-family: 'Space Grotesk', 'Inter', sans-serif;
-  font-size: 42px;
-  font-weight: 800;
-  color: #1a1a1a;
-  line-height: 1;
-  margin-bottom: 8px;
-  letter-spacing: -0.02em;
-}
-.kpi .kpi-label {
-  font-size:11px; color:var(--muted); margin-top:6px;
-  text-transform:uppercase; letter-spacing:.8px; font-weight:600;
-}
-.kpi-accent { border-color: var(--redis-red); border-width: 2px; }
-.kpi-accent .kpi-num { color: var(--redis-red); }
-.kpi-accent .kpi-value { color: var(--redis-red); }
 
-/* Cenários lado a lado */
-.scenarios { display:grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 10px 16px; }
-@media (max-width: 1024px) { .scenarios { grid-template-columns: 1fr; } }
-
-.card {
-  background: var(--white); border:2px solid var(--line); border-radius: var(--radius);
-  padding:16px; transition: border-color .2s ease;
+.login-sub {
+  font-size: 13px;
+  color: var(--soft);
+  text-align: center;
+  margin: 0 0 28px;
 }
-.card:hover { border-color: var(--redis-red); }
-.card .card-title {
+
+/* ── App header ── */
+.app-header {
+  background: linear-gradient(90deg, #0b1220 0%, #1c2434 100%);
+  color: #fff;
+  padding: 14px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.app-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.app-header-brand img {
+  height: 26px;
+  filter: brightness(0) invert(1);
+}
+
+.app-header-divider {
+  width: 1px;
+  height: 28px;
+  background: rgba(255,255,255,.2);
+}
+
+.app-header-text .app-title {
   font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size:18px; font-weight:700; color:var(--ink); margin-bottom:12px;
-  display: flex; align-items: center; gap: 8px;
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: #fff;
 }
 
-/* Source badges */
-.source-badge {
-  display: inline-block; padding: 4px 10px; border-radius: 6px;
-  font-size: 11px; font-weight: 700; text-transform: uppercase;
-  letter-spacing: .5px;
-}
-.source-cache { background: #d1fae5; color: #065f46; }
-.source-llm { background: #fef3c7; color: #92400e; }
-
-/* History */
-.dataframe { background: var(--white); border:1px solid var(--line); border-radius: var(--radius); }
-.dataframe thead tr th { font-size:12px; font-weight:600; }
-.dataframe tbody tr td { font-size:12px; }
-
-/* Buttons */
-button.primary, .gr-button-primary {
-  background: var(--redis-red) !important; border-color: var(--redis-red) !important; color:#fff !important;
-  font-weight: 600 !important; transition: all .2s ease !important;
-}
-button.primary:hover, .gr-button-primary:hover {
-  background: #c02518 !important; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(216,44,32,.3) !important;
+.app-header-text .app-sub {
+  font-size: 11px;
+  color: rgba(255,255,255,.6);
+  margin-top: 2px;
 }
 
-/* Secondary buttons */
-.secondary-btn {
-  background: var(--white) !important; border: 1px solid var(--line) !important;
-  color: var(--soft) !important; font-weight: 600 !important;
+.app-header-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(216,44,32,.8);
+  border: 1px solid rgba(255,255,255,.2);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 999px;
+  letter-spacing: .3px;
 }
 
-/* --- HERO (título + subtítulo) --- */
+/* ── Hero section ── */
 .hero {
-  background: #ffffff;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  margin: 16px;
-  padding: 16px 18px;
+  background: var(--white);
+  border-bottom: 1px solid var(--line);
+  padding: 20px 24px;
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
 }
+
+.hero-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: #fff0ef;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  flex-shrink: 0;
+}
+
+.hero-content {}
 
 .hero-title {
   font-family: 'Space Grotesk', Inter, sans-serif;
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
-  color: var(--ink);      /* força contraste alto */
-  letter-spacing: .2px;
-  margin: 0 0 8px 0;
+  color: var(--ink);
+  margin: 0 0 6px;
 }
 
 .hero-sub {
-  font-size: 14px;
+  font-size: 13.5px;
   color: var(--soft);
-  line-height: 1.6;
+  line-height: 1.65;
   margin: 0;
 }
 
-/* Se em algum tema o título estiver “preto no preto”, garante contraste: */
+/* ── Config card ── */
+.config-card {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin: 16px;
+}
+
+.config-card label {
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  color: var(--ink) !important;
+}
+
+/* ── KPI strip ── */
+.kpi-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 16px;
+}
+
+@media (max-width: 900px) { .kpi-row { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 480px) { .kpi-row { grid-template-columns: 1fr; } }
+
+.kpi {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.kpi:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,.08);
+}
+
+.kpi-icon {
+  font-size: 20px;
+  margin-bottom: 4px;
+  line-height: 1;
+}
+
+.kpi-value {
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 36px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .7px;
+  margin-top: 2px;
+}
+
+/* Colour variants */
+.kpi-hits .kpi-value  { color: var(--hit-color); }
+.kpi-misses .kpi-value { color: var(--miss-color); }
+.kpi-rate .kpi-value  { color: var(--rate-color); }
+.kpi-savings {
+  border-color: var(--redis-red);
+  border-width: 2px;
+}
+.kpi-savings .kpi-value { color: var(--savings-color); }
+
+/* ── Main content area ── */
+.main-content {
+  margin: 0 16px 16px;
+}
+
+/* ── Section headings ── */
+.section-heading {
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 20px 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* ── Source badges ── */
+.source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .4px;
+  text-transform: uppercase;
+}
+
+.source-cache {
+  background: var(--hit-bg);
+  color: var(--hit-color);
+  border: 1px solid #a7f3d0;
+}
+
+.source-llm {
+  background: var(--miss-bg);
+  color: var(--miss-color);
+  border: 1px solid #fde68a;
+}
+
+/* ── Buttons ── */
+button.primary, .gr-button-primary {
+  background: var(--redis-red) !important;
+  border-color: var(--redis-red) !important;
+  color: #fff !important;
+  font-weight: 600 !important;
+  border-radius: 8px !important;
+  transition: all .18s ease !important;
+}
+button.primary:hover, .gr-button-primary:hover {
+  background: var(--redis-red-dark) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 14px rgba(216,44,32,.35) !important;
+}
+
+/* ── How-to steps ── */
+.how-to {
+  background: var(--white);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 20px 22px;
+  margin-top: 16px;
+}
+
+.how-to-title {
+  font-family: 'Space Grotesk', Inter, sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--ink);
+  margin: 0 0 16px;
+}
+
+.how-to-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.how-to-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--redis-red);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.step-body {}
+.step-title { font-weight: 600; font-size: 13.5px; color: var(--ink); }
+.step-desc  { font-size: 12.5px; color: var(--soft); margin-top: 2px; line-height: 1.5; }
+
+.example-queries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.example-query {
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 12.5px;
+  color: var(--soft);
+  font-style: italic;
+}
+
+/* ── Dark mode overrides ── */
+body.dark .kpi,
+body.dark .config-card,
+body.dark .hero,
+body.dark .how-to {
+  background: var(--white);
+  border-color: var(--line);
+}
+
+body.dark .kpi-label,
+body.dark .step-desc,
+body.dark .hero-sub {
+  color: var(--muted);
+}
+
+body.dark .step-title,
+body.dark .how-to-title,
+body.dark .hero-title,
+body.dark .section-heading {
+  color: var(--ink);
+}
+
+/* Gradio overrides */
+.gradio-container { background: var(--bg) !important; }
+footer { display: none !important; }
+
 .h1 { color: var(--ink) !important; background: transparent !important; }
 """
 
@@ -573,33 +802,38 @@ function() {
 with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css=CUSTOM_CSS, elem_id="app-root") as demo:
     st = gr.State({"hits": 0, "misses": 0, "saved_cost": 0.0})
 
-    # Title + Subtitle
+    # ── Header ──
     gr.HTML("""
-      <div class="hero">
-        <div class="hero-title">Simple Semantic Caching with LangCache</div>
-        <p class="hero-sub">
-          This demo shows how LangCache caches LLM responses semantically.<br/>
-          Ask the same question twice - the second time will be a cache hit!<br/>
-          Try asking questions in different ways to see semantic matching in action.
-        </p>
+      <div class="app-header">
+        <div class="app-header-brand">
+          <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
+               alt="Redis" onerror="this.style.display='none'">
+          <div class="app-header-divider"></div>
+          <div class="app-header-text">
+            <div class="app-title">LangCache Demo</div>
+            <div class="app-sub">Semantic Caching for LLM Applications</div>
+          </div>
+        </div>
+        <div class="app-header-badge">⚡ Powered by Redis</div>
       </div>
     """)
 
-    # Theme toggle button
-    with gr.Row():
-        theme_toggle_btn = gr.Button("☀️ Light Mode", size="sm", scale=0, elem_id="theme-toggle")
+    # ── Hero ──
+    gr.HTML("""
+      <div class="hero">
+        <div class="hero-icon">🧠</div>
+        <div class="hero-content">
+          <div class="hero-title">Simple Semantic Caching with LangCache</div>
+          <p class="hero-sub">
+            LangCache caches LLM responses and reuses them for semantically similar questions —
+            saving cost and cutting latency. Ask the same question twice to see a cache hit,
+            or rephrase it to test semantic matching.
+          </p>
+        </div>
+      </div>
+    """)
 
-    theme_toggle_btn.click(
-        fn=None,
-        js="""() => {
-            const isDark = document.body.classList.toggle('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
-            return isDark ? '🌙 Dark Mode' : '☀️ Light Mode';
-        }""",
-        outputs=theme_toggle_btn
-    )
-
-    # Settings
+    # ── Settings ──
     with gr.Group(elem_classes=["config-card"]):
         with gr.Row():
             threshold_global = gr.Slider(
@@ -608,50 +842,89 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
                 maximum=1.0,
                 value=0.85,
                 step=0.05,
-                info="Higher = more strict matching"
+                info="Higher = stricter matching (fewer false hits)"
             )
             exact_sem_global = gr.Checkbox(
-                label="Use EXACT→SEMANTIC fallback",
+                label="Use EXACT → SEMANTIC fallback",
                 value=True,
-                info="Try exact match first, then semantic"
+                info="Try exact match first, then fall back to semantic"
             )
 
-    # KPIs
+    # ── KPI strip ──
+    gr.HTML("<div class='kpi-row' id='kpi-strip'>")
     with gr.Row(elem_classes=["kpi-row"]):
-        kpi_hits = gr.HTML("<div class='kpi'><div class='kpi-num'>0</div><div class='kpi-label'>Hits</div></div>")
-        kpi_misses = gr.HTML("<div class='kpi'><div class='kpi-num'>0</div><div class='kpi-label'>Misses</div></div>")
-        kpi_rate = gr.HTML("<div class='kpi'><div class='kpi-num'>0.0%</div><div class='kpi-label'>Hit Rate</div></div>")
-        kpi_savings = gr.HTML("<div class='kpi kpi-accent'><div class='kpi-num'>$0.00</div><div class='kpi-label'>Cost Saved</div></div>")
+        kpi_hits    = gr.HTML("<div class='kpi kpi-hits'><div class='kpi-icon'>✅</div><div class='kpi-value'>0</div><div class='kpi-label'>Cache Hits</div></div>")
+        kpi_misses  = gr.HTML("<div class='kpi kpi-misses'><div class='kpi-icon'>⚡</div><div class='kpi-value'>0</div><div class='kpi-label'>Cache Misses</div></div>")
+        kpi_rate    = gr.HTML("<div class='kpi kpi-rate'><div class='kpi-icon'>📊</div><div class='kpi-value'>—</div><div class='kpi-label'>Hit Rate</div></div>")
+        kpi_savings = gr.HTML("<div class='kpi kpi-savings'><div class='kpi-icon'>💰</div><div class='kpi-value'>$0.0000</div><div class='kpi-label'>Cost Saved</div></div>")
+    gr.HTML("</div>")
 
-    # Simple Chat Interface
-    gr.Markdown("### 💬 Ask Questions")
-    prompt_input = gr.Textbox(label="Question", placeholder="Ask something… (e.g., What is machine learning?)", lines=3)
-    ask_btn = gr.Button("Ask", variant="primary", size="lg")
-    answer_output = gr.Textbox(label="Answer", lines=6, interactive=False)
+    # ── Chat interface ──
+    gr.HTML("<div style='margin: 0 16px;'>")
+    gr.HTML("<div class='section-heading'>💬 Ask a Question</div>")
     with gr.Row():
-        source_output = gr.HTML(label="Source")
-        latency_output = gr.HTML(label="Latency")
+        with gr.Column(scale=5):
+            prompt_input = gr.Textbox(
+                label="",
+                placeholder="e.g. What is machine learning?",
+                lines=3,
+                show_label=False,
+            )
+        with gr.Column(scale=1, min_width=120):
+            ask_btn = gr.Button("Ask →", variant="primary", size="lg")
+
+    answer_output = gr.Textbox(label="Answer", lines=6, interactive=False)
+
+    with gr.Row():
+        source_output  = gr.HTML()
+        latency_output = gr.HTML()
+
     with gr.Accordion("🔍 Debug Info", open=False):
         debug_output = gr.Code(label="Debug JSON", language="json")
+
     with gr.Accordion("🧹 Cache Management", open=False):
-        flush_btn = gr.Button("Clear All Cache", variant="secondary")
+        flush_btn    = gr.Button("Clear All Cache Entries", variant="secondary")
         flush_status = gr.HTML()
         with gr.Accordion("Flush Debug", open=False):
             flush_debug = gr.Code(language="json")
+    gr.HTML("</div>")
 
-    # Usage Instructions
-    gr.Markdown("""
-    ### 📖 How to Use
-
-    1. **Ask a question** - Type your question in the box above
-    2. **First time** - Will call OpenAI (cache miss)
-    3. **Ask again** - Same or similar question will hit cache!
-    4. **Test semantic matching** - Try asking the question different ways
-
-    **Test Examples:**
-    - "What is machine learning?"
-    - "Explain machine learning to me" ← Semantic match!
-    - "Tell me about machine learning" ← Also a match!
+    # ── How-to ──
+    gr.HTML("""
+      <div style="margin: 0 16px 24px;">
+        <div class="how-to">
+          <div class="how-to-title">📖 How to Use</div>
+          <div class="how-to-steps">
+            <div class="how-to-step">
+              <div class="step-num">1</div>
+              <div class="step-body">
+                <div class="step-title">Ask any question</div>
+                <div class="step-desc">First request calls OpenAI — this is a <strong>cache miss</strong>.</div>
+              </div>
+            </div>
+            <div class="how-to-step">
+              <div class="step-num">2</div>
+              <div class="step-body">
+                <div class="step-title">Ask the same question again</div>
+                <div class="step-desc">Response is served instantly from cache — a <strong>cache hit</strong>!</div>
+              </div>
+            </div>
+            <div class="how-to-step">
+              <div class="step-num">3</div>
+              <div class="step-body">
+                <div class="step-title">Try rephrasing</div>
+                <div class="step-desc">Semantic matching returns cached answers even for differently-worded questions.</div>
+              </div>
+            </div>
+          </div>
+          <div class="example-queries" style="margin-top:16px;">
+            <span style="font-size:12px;font-weight:600;color:var(--muted);align-self:center;margin-right:4px;">Try:</span>
+            <span class="example-query">"What is machine learning?"</span>
+            <span class="example-query">"Explain machine learning to me"</span>
+            <span class="example-query">"Tell me about ML"</span>
+          </div>
+        </div>
+      </div>
     """)
 
     # ==== Events ====
@@ -679,14 +952,17 @@ with gr.Blocks(title="Redis LangCache — English Demo", theme=custom_theme, css
         total = state_dict["hits"] + state_dict["misses"]
         hit_rate = (state_dict["hits"] / total * 100) if total else 0
 
-        # Update KPI HTML with color-coded values
-        kpi_h = f"<div class='kpi'><div class='kpi-value' style='color: #00C853;'>{state_dict['hits']}</div><div class='kpi-label'>Cache Hits</div></div>"
-        kpi_m = f"<div class='kpi'><div class='kpi-value' style='color: #FF6D00;'>{state_dict['misses']}</div><div class='kpi-label'>Cache Misses</div></div>"
-        kpi_r = f"<div class='kpi'><div class='kpi-value' style='color: #2196F3;'>{hit_rate:.1f}%</div><div class='kpi-label'>Hit Rate</div></div>"
-        kpi_s = f"<div class='kpi kpi-accent'><div class='kpi-value'>${state_dict['saved_cost']:.4f}</div><div class='kpi-label'>Cost Saved</div></div>"
+        # Update KPI HTML with new CSS classes
+        kpi_h = f"<div class='kpi kpi-hits'><div class='kpi-icon'>✅</div><div class='kpi-value'>{state_dict['hits']}</div><div class='kpi-label'>Cache Hits</div></div>"
+        kpi_m = f"<div class='kpi kpi-misses'><div class='kpi-icon'>⚡</div><div class='kpi-value'>{state_dict['misses']}</div><div class='kpi-label'>Cache Misses</div></div>"
+        kpi_r = f"<div class='kpi kpi-rate'><div class='kpi-icon'>📊</div><div class='kpi-value'>{hit_rate:.1f}%</div><div class='kpi-label'>Hit Rate</div></div>"
+        kpi_s = f"<div class='kpi kpi-savings'><div class='kpi-icon'>💰</div><div class='kpi-value'>${state_dict['saved_cost']:.4f}</div><div class='kpi-label'>Cost Saved</div></div>"
 
         # Source badge
-        badge = f"<span class='source-badge source-{source}'>{'✓ CACHE HIT' if source == 'cache' else '⚡ LLM CALL'}</span>"
+        if source == "cache":
+            badge = "<span class='source-badge source-cache'>✓ Cache Hit</span>"
+        else:
+            badge = "<span class='source-badge source-llm'>⚡ LLM Call</span>"
 
         return answer, badge, debug, latency, kpi_h, kpi_m, kpi_r, kpi_s, state_dict
 
@@ -750,29 +1026,56 @@ def check_password(password):
         }
 
 # Wrap the demo with password protection
-with gr.Blocks(title="Redis LangCache — English Demo", css=CUSTOM_CSS) as app:
+LOGIN_EXTRA_CSS = """
+/* Force login container to fill viewport and center the card */
+#login-container > .gap,
+#login-container > .form {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-height: 100vh !important;
+}
+
+/* Card styling */
+#login-card-wrap {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 20px;
+  padding: 40px;
+  box-shadow: 0 20px 60px rgba(0,0,0,.30);
+}
+
+#login-container {
+  background: linear-gradient(135deg, #0b1220 0%, #1a1f2e 60%, #8b1a14 150%) !important;
+  min-height: 100vh !important;
+}
+"""
+
+with gr.Blocks(title="Redis LangCache — English Demo", css=CUSTOM_CSS + LOGIN_EXTRA_CSS) as app:
     with gr.Column(visible=True, elem_id="login-container") as login_box:
         gr.HTML("""
-            <div style="max-width: 400px; margin: 100px auto; padding: 40px; background: white; border-radius: 16px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);">
-                <div style="text-align: center; margin-bottom: 30px;">
-                    <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
-                         alt="Redis" style="height: 40px; margin-bottom: 16px;">
-                    <h2 style="font-family: 'Space Grotesk', sans-serif; color: #0b1220; margin: 0;">Redis LangCache Demo</h2>
+            <div id="login-card-wrap">
+              <div style="text-align:center; margin-bottom:28px;">
+                <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/e/ee/Redis_logo.svg/2560px-Redis_logo.svg.png"
+                     alt="Redis" style="height:36px; margin-bottom:16px; display:block; margin-left:auto; margin-right:auto;"
+                     onerror="this.style.display='none'">
+                <div style="font-family:'Space Grotesk',sans-serif; font-size:22px; font-weight:700; color:#0b1220; margin-bottom:6px;">
+                  Redis LangCache Demo
                 </div>
-            </div>
+                <div style="font-size:13px; color:#64748b;">Enter your password to continue</div>
+              </div>
         """)
-        with gr.Row():
-            gr.HTML("<div style='flex: 1;'></div>")
-            with gr.Column(scale=1, min_width=300):
-                password_input = gr.Textbox(
-                    label="🔒 Password",
-                    type="password",
-                    placeholder="Enter password...",
-                    elem_id="password-input"
-                )
-                login_btn = gr.Button("Login", variant="primary", size="lg")
-                login_status = gr.HTML("")
-            gr.HTML("<div style='flex: 1;'></div>")
+        password_input = gr.Textbox(
+            label="Password",
+            type="password",
+            placeholder="Enter password…",
+            elem_id="password-input"
+        )
+        login_btn = gr.Button("Login →", variant="primary", size="lg")
+        login_status = gr.HTML("")
+        gr.HTML("</div>")
 
     with gr.Column(visible=False) as main_app:
         demo.render()
@@ -815,11 +1118,7 @@ with gr.Blocks(title="Redis LangCache — English Demo", css=CUSTOM_CSS) as app:
     )
 
     # Initialize theme on page load
-    app.load(
-        fn=None,
-        js=theme_js,
-        outputs=theme_toggle_btn
-    )
+    app.load(fn=None, js=theme_js)
 
 if __name__ == "__main__":
     if lang_cache:
